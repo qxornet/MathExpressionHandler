@@ -1,4 +1,4 @@
-﻿#include "mathexphandler.hpp"
+﻿#include "MathExpHandler.hpp"
 
 MathExpHandler::MathExpHandler()
 {
