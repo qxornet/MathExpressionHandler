@@ -29,6 +29,7 @@
 struct BaseOpt
 {
     int weight;
+    bool isAloneArg;
     CalcFunc function;
 
     double operator()(double _larg, double _rarg);
@@ -75,17 +76,16 @@ private:
     double finally {0.0};
 
     std::map<QString, BaseOpt> optMap = {
-        {"(", {1, nullptr}}, {")", {1, nullptr}},
-        {"/", {8, nullptr}}, {"^", {8, nullptr}},
-        {"*", {8, nullptr}}, {"-", {6, nullptr}},
-        {"+", {6, nullptr}}, {"%", {5, nullptr}},
-        {"$sqrt", {8, nullptr}}, {"$abs",  {8, nullptr}},
-        {"$sin",  {8, nullptr}}, {"$cos",  {8, nullptr}},
-        {"$arcsin",  {8, nullptr}}, {"$arccos",  {8, nullptr}},
-        {"$log",  {8, nullptr}}, {"$dlog",  {8, nullptr}},
-        {"$exp",  {8, nullptr}}, {"$floor",  {8, nullptr}},
-        {"$ceil",  {8, nullptr}}
+        {"(", {1, true, nullptr}}, {")", {1, true, nullptr}},
+        {"/", {8, false, nullptr}}, {"^", {8, false, nullptr}},
+        {"*", {8, false, nullptr}}, {"-", {6, false, nullptr}},
+        {"+", {6, false, nullptr}}, {"%", {5, false, nullptr}},
+        {"$sqrt", {8, true, nullptr}}, {"$abs",  {8, true, nullptr}},
+        {"$sin",  {8, true, nullptr}}, {"$cos",  {8, true, nullptr}},
+        {"$arcsin",  {8, true, nullptr}}, {"$arccos",  {8, true, nullptr}},
+        {"$log",  {8, true, nullptr}}, {"$dlog",  {8, true, nullptr}},
+        {"$exp",  {8, true, nullptr}}, {"$floor",  {8, true, nullptr}},
+        {"$ceil",  {8, true, nullptr}}
     };
 
 };
-

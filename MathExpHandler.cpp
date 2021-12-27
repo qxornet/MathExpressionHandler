@@ -19,7 +19,15 @@ void MathExpHandler::setFormatString(QString formula)
 void MathExpHandler::processing()
 {
     stringConversion();
+
+    for(auto& item : operands)
+    {
+        std::cout << item.toStdString() + " ";
+    }
+
     calcMathExp();
+
+    std::cout << " = ";
 
     for(auto& item : operands)
     {
@@ -51,8 +59,8 @@ void MathExpHandler::stringConversion()
         if(!symbol.compare("$")) isWaitOpt = true;
         if(optMap.find(symbol) != optMap.end())
         {
-            try
-            {
+            try {
+
                 if(!value.isEmpty())
                 {
                     addOperator(value);
@@ -63,9 +71,8 @@ void MathExpHandler::stringConversion()
                 symbol.clear();
 
                 isWaitOpt = false;
-            }
-            catch(std::string e)
-            {
+
+            } catch(std::string e) {
                 std::cout << e << std::endl;
             }
         }
@@ -76,6 +83,11 @@ void MathExpHandler::stringConversion()
         }
     }
 
+    std::sort(operations.begin(), operations.end(), [this](auto& litem, auto& ritem)
+    {
+       if(optMap[litem].weight >= optMap[ritem].weight) return true;
+    });
+
     addOperator(value);
     operands.insert(operands.end(), operations.begin(), operations.end());
     operations.clear();
@@ -83,26 +95,39 @@ void MathExpHandler::stringConversion()
 
 void MathExpHandler::calcMathExp()
 {
-    double lvalue = 0.0;
-    double rvalue = 0.0;
+    std::list<QString> window;
 
-    for(auto& item : operands)
+    for(auto iter = operands.begin(); iter != operands.end(); iter++)
     {
+        if(window.size() == 3) window.pop_front();
+        window.push_back(*iter);
 
-        if(optMap.find(item) != optMap.end() &&
-                lvalue != 0 && rvalue != 0)
+        if(optMap.find(window.back()) == optMap.end()) continue;
+
+        double result = 0.0;
+        if(optMap[window.back()].isAloneArg)
         {
-            double result = optMap[item](lvalue, rvalue);
-            auto rfound = std::find(operands.begin(), operands.end(), QString::number(rvalue));
-            auto lfound = std::find(operands.begin(), operands.end(), QString::number(lvalue));
-            operands.erase(rfound);
+            auto value = std::next(window.begin(), 1);
+            result = optMap[window.back()](value->toDouble(), 1);
+            operands.erase(iter); iter -= 1;
+
+            *iter = QString::number(result);
+        }
+        else
+        {
+            auto lvalue = window.begin();
+            auto rvalue = std::next(window.begin(), 1);
+
+            result = optMap[window.back()](lvalue->toDouble(), rvalue->toDouble());
+            operands.erase(iter-2, iter); iter -= 2;
+
+            *iter = QString::number(result);
         }
 
-        lvalue = lvalue == 0 ? item.toDouble() : lvalue;
-        rvalue = rvalue == 0 ? item.toDouble() : rvalue;
+        iter = operands.begin() - 1;
     }
 
-    qDebug() << optMap["^"](10, 2);
+    finally = operands[0].toDouble();
 }
 
 void MathExpHandler::addOperation(QString _opt)
@@ -138,6 +163,16 @@ void MathExpHandler::addOperator(QString _opr)
 {
     if(!_opr.isEmpty())
         operands.push_back(_opr);
+}
+
+MathExpHandler::~MathExpHandler()
+{
+
+}
+
+double BaseOpt::operator()(double _larg, double _rarg)
+{
+    return function(_larg, _rarg);
 }
 
 void MathExpHandler::funcInitilize()
@@ -209,15 +244,4 @@ void MathExpHandler::funcInitilize()
     optMap["$ceil"].function = [](double leftValue, double rightValue) {
         return std::ceil(leftValue);
     };
-}
-
-
-MathExpHandler::~MathExpHandler()
-{
-
-}
-
-double BaseOpt::operator()(double _larg, double _rarg)
-{
-    return function(_larg, _rarg);
 }
