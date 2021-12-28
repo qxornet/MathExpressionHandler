@@ -18,14 +18,26 @@ void MathExpHandler::setFormatString(QString formula)
 
 void MathExpHandler::processing()
 {
-    stringConversion();
-    calcMathExp();
+    try
+    {
+        stringConversion();
+        calcMathExp();
+    }
+    catch(...)
+    {
+        std::cout << "Incorrect syntax" << std::endl;
+    }
 }
 
 
 double MathExpHandler::getFinally() const
 {
     return finally;
+}
+
+QString MathExpHandler::formatString() const
+{
+    return format;
 }
 
 void MathExpHandler::stringConversion()
@@ -44,22 +56,16 @@ void MathExpHandler::stringConversion()
         if(!symbol.compare("$")) isWaitOpt = true;
         if(optMap.find(symbol) != optMap.end())
         {
-            try {
-
-                if(!value.isEmpty())
-                {
-                    addOperator(value);
-                    value.clear();
-                }
-
-                addOperation(symbol);
-                symbol.clear();
-
-                isWaitOpt = false;
-
-            } catch(std::string e) {
-                std::cout << e << std::endl;
+            if(!value.isEmpty())
+            {
+                addOperator(value);
+                value.clear();
             }
+
+            addOperation(symbol);
+            symbol.clear();
+
+            isWaitOpt = false;
         }
         else
         {
@@ -84,6 +90,7 @@ void MathExpHandler::calcMathExp()
 
     for(auto iter = operands.begin(); iter != operands.end(); iter++)
     {
+        if(operands.size() <= 1) break;
         if(window.size() == 3 && operands.size() >= 3) window.pop_front();
         window.push_back(*iter);
 
@@ -92,6 +99,7 @@ void MathExpHandler::calcMathExp()
         double result = 0.0;
         if(optMap[window.back()].isAloneArg)
         {
+            if(window.size() < 2) throw std::string("Icorrect syntax");
             auto value = std::prev(window.end(), 2);
             result = optMap[window.back()](value->toDouble(), 1);
             operands.erase(iter); iter -= 1;
@@ -112,16 +120,22 @@ void MathExpHandler::calcMathExp()
         iter = operands.begin() - 1;
     }
 
-    finally = operands[0].toDouble();
+
+    finally = operands.size() > 0 ? operands[0].toDouble() : 0;
 }
 
 void MathExpHandler::addOperation(QString _opt)
 {
-    if(!_opt.compare(")"))
+    bool isBlock = false;
+    QString symbol = "(";
+    if(!_opt.compare(")")) isBlock = true;
+    else if(!_opt.compare("]")) { symbol = "["; isBlock = true; }
+
+    if(isBlock)
     {
         std::reverse(operations.begin(), operations.end());
 
-        auto founded = std::find(operations.begin(), operations.end(), "(");
+        auto founded = std::find(operations.begin(), operations.end(), symbol);
         if(founded == operations.end()) throw std::string("Syntax error");
 
         operands.insert(operands.end(), operations.begin(), founded);
@@ -131,7 +145,7 @@ void MathExpHandler::addOperation(QString _opt)
         return;
     }
 
-    if(!_opt.compare("(")) { operations.push_back(_opt); return; }
+    if(!_opt.compare("(") || !_opt.compare("[")) { operations.push_back(_opt); return; }
     if(!operations.empty() && optMap[_opt].weight <= optMap[operations.back()].weight)
     {
 

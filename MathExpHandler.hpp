@@ -50,7 +50,7 @@ public:
     void processing();
 
     double getFinally() const;
-
+    QString formatString() const;
 
 private:
 
@@ -77,6 +77,7 @@ private:
 
     std::map<QString, BaseOpt> optMap = {
         {"(", {1, true, nullptr}}, {")", {1, true, nullptr}},
+        {"[", {1, true, nullptr}}, {"]", {1, true, nullptr}},
         {"/", {8, false, nullptr}}, {"^", {8, false, nullptr}},
         {"*", {8, false, nullptr}}, {"-", {6, false, nullptr}},
         {"+", {6, false, nullptr}}, {"%", {5, false, nullptr}},
