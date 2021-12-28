@@ -80,12 +80,12 @@ private:
         {"/", {8, false, nullptr}}, {"^", {8, false, nullptr}},
         {"*", {8, false, nullptr}}, {"-", {6, false, nullptr}},
         {"+", {6, false, nullptr}}, {"%", {5, false, nullptr}},
-        {"$sqrt", {8, true, nullptr}}, {"$abs",  {8, true, nullptr}},
-        {"$sin",  {8, true, nullptr}}, {"$cos",  {8, true, nullptr}},
-        {"$arcsin",  {8, true, nullptr}}, {"$arccos",  {8, true, nullptr}},
-        {"$log",  {8, true, nullptr}}, {"$dlog",  {8, true, nullptr}},
-        {"$exp",  {8, true, nullptr}}, {"$floor",  {8, true, nullptr}},
-        {"$ceil",  {8, true, nullptr}}
+        {"$sqrt", {9, true, nullptr}}, {"$abs",  {9, true, nullptr}},
+        {"$sin",  {9, true, nullptr}}, {"$cos",  {9, true, nullptr}},
+        {"$arcsin",  {9, true, nullptr}}, {"$arccos",  {9, true, nullptr}},
+        {"$log",  {9, true, nullptr}}, {"$dlog",  {9, true, nullptr}},
+        {"$exp",  {9, true, nullptr}}, {"$floor",  {9, true, nullptr}},
+        {"$ceil",  {9, true, nullptr}}
     };
 
 };
