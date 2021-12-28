@@ -19,22 +19,7 @@ void MathExpHandler::setFormatString(QString formula)
 void MathExpHandler::processing()
 {
     stringConversion();
-
-    for(auto& item : operands)
-    {
-        std::cout << item.toStdString() + " ";
-    }
-
     calcMathExp();
-
-    std::cout << " = ";
-
-    for(auto& item : operands)
-    {
-        std::cout << item.toStdString() + " ";
-    }
-
-    std::cout << std::endl;
 }
 
 
@@ -99,7 +84,7 @@ void MathExpHandler::calcMathExp()
 
     for(auto iter = operands.begin(); iter != operands.end(); iter++)
     {
-        if(window.size() == 3) window.pop_front();
+        if(window.size() == 3 && operands.size() >= 3) window.pop_front();
         window.push_back(*iter);
 
         if(optMap.find(window.back()) == optMap.end()) continue;
@@ -107,7 +92,7 @@ void MathExpHandler::calcMathExp()
         double result = 0.0;
         if(optMap[window.back()].isAloneArg)
         {
-            auto value = std::next(window.begin(), 1);
+            auto value = std::prev(window.end(), 2);
             result = optMap[window.back()](value->toDouble(), 1);
             operands.erase(iter); iter -= 1;
 
@@ -161,8 +146,10 @@ void MathExpHandler::addOperation(QString _opt)
 
 void MathExpHandler::addOperator(QString _opr)
 {
-    if(!_opr.isEmpty())
-        operands.push_back(_opr);
+    if(_opr.isEmpty()) return;
+
+    _opr.replace("~", "-");
+    operands.push_back(_opr);
 }
 
 MathExpHandler::~MathExpHandler()
